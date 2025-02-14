@@ -1,3 +1,4 @@
+#include "libft/libft_all.h"
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>

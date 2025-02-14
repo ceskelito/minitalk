@@ -17,18 +17,22 @@ int btod(int *bin)
 
 void handler(int sig, siginfo_t *info, void *context)
 {
+    (void)context;
     static int index;
     int toprint;
     int binchar[32];
+    pid_t client_pid;
 
+    client_pid = info->si_pid;
     binchar[index++] = (sig == SIGUSR1);
-    kill(info->si_pid, SIGUSR1);
     if(index == 32)
     {
         index = 0;
         toprint = btod(binchar);
-        write(1, &toprint, 1);
+        if(toprint != -1)
+            write(1, &toprint, 1);
     }
+    kill(client_pid, SIGUSR1);
 }
 
 int main(void)
@@ -41,12 +45,12 @@ int main(void)
     printf("Server PID: %d\n", getpid());
     if(sigaction(SIGUSR1, &sa, NULL) == -1)
     {
-        printf("Impossible to manage signal n. %d", SIGUSR1);
+        ft_printf("Impossible to manage signal n. %d", SIGUSR1);
         exit(EXIT_FAILURE);
     }
     if(sigaction(SIGUSR2, &sa, NULL) == -1)
     {
-        printf("Impossible to manage signal n. %d", SIGUSR2);
+        ft_printf("Impossible to manage signal n. %d", SIGUSR2);
         exit(EXIT_FAILURE);
     }
     while (1)
