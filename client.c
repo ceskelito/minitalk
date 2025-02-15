@@ -1,8 +1,15 @@
 #include "header.h"
 
-volatile sig_atomic_t confirmation = 0;
+volatile sig_atomic_t hand_shaked = 0;
 
-void dtob(int dec, int bin[32])
+void handler(int sig)
+{
+    if(sig == SIGUSR1)
+        hand_shaked = 1;
+}
+
+//  Decimal to binary
+void dtob(int dec, int bin[BINARIES_LEN])
 {
     int i;
     int j;
@@ -16,52 +23,61 @@ void dtob(int dec, int bin[32])
     }
 }
 
-void handler(int sig)
-{
-    if(sig == SIGUSR1)
-        confirmation = 1;
-}
-
-void sendbin(char c, pid_t server_pid)
+void encode_and_send(char c, pid_t server_pid)
 {
     int i = 0;
-    int bin[32];
+    int bin[BINARIES_LEN];
 
     dtob((int)c, bin);
-    while (i < 32)
+    while (i < BINARIES_LEN)
     {
-        confirmation = 0;
+        hand_shaked = 0;
         if (bin[i] == 1)
             kill(server_pid, SIGUSR1);
         else
             kill(server_pid, SIGUSR2);
         i++;
-        while (!confirmation)
-            ;
+        while (!hand_shaked)
+            pause();
     }
 }
+
+
+/**************************************************************************************
+
+OPERATION (client side):
+
+The first argument is the PID of the server (another program),
+the second argument is the message to send to the server.
+
+The client and the server will only comminucate trought UNIX signals SIGUSR1/2.
+To accomplish the mission with this limitation the client will convert any characther
+into a binary string (treating the char as an integerbased on the position
+in the unicode table) and then send it using the two signals as one and zeros.
+
+The server will decode the message and print it.
+
+To avoid races conditions, the client will ever wait for an handshake
+from the server at any bit sent before proceding.
+
+*****************************************************************************************/
 
 int main(int ac, char **av)
 {
     pid_t server_pid;
-    char *message;
     struct sigaction sa;
 
     if (ac != 3)
         exit(EXIT_FAILURE);
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = handler;
-    sigaction(SIGUSR1, &sa, NULL);
-    server_pid = ft_atoi(av[1]);
-    message = malloc(sizeof(av[2]) + sizeof(char));
-    if(!message)
-        exit(EXIT_FAILURE);
-    ft_strlcpy(message, av[2], ft_strlen(av[2]) + 1);
-    while (*message)
+    if(sigaction(SIGUSR1, &sa, NULL) == -1)
     {
-        sendbin(*message, server_pid);
-        message++;
+        ft_printf("Impossible to manage signal n. %d", SIGUSR1);
+        exit(EXIT_FAILURE);
     }
+    server_pid = ft_atoi(av[1]);
+    while (*av[2])
+        encode_and_send(*av[2]++, server_pid);
     ft_printf("\n-- Comunication completed --\n");
-    free(message - ft_strlen(av[2]));
 }

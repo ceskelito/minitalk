@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BINARIES_LEN 32
+
 /* 
 //included to avoid squiggles errors
 #include <asm-generic/signal-defs.h>
