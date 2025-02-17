@@ -1,21 +1,22 @@
 NAME	:= client server
-LIB 	:= libft/libft.a
 
 CC 		:= cc
 CFLAGS 	:= -Wall -Wextra -Werror
 RM 		:= rm -f
 
-MODE	?= mandatory
+LIB 	:= libft/libft.a
 
-DIR             := mandatory
-CLIENT_SRC      := client.c
-SERVER_SRC      := server.c
+M_DIR 			:= mandatory
+M_CLIENT_SRC 	:= client.c
+M_SERVER_SRC 	:= server.c
 
-ifeq ($(MODE), bonus)
-DIR             := bonus
-CLIENT_SRC      := bonus_client.c
-SERVER_SRC      := bonus_server.c
-endif
+B_DIR			:= bonus_dir
+B_CLIENT_SRC 	:= bonus_client.c
+B_SERVER_SRC 	:= bonus_server.c
+
+CLIENT_SRC 	= $(M_CLIENT_SRC)
+SERVER_SRC 	= $(M_SERVER_SRC)
+DIR			= $(M_DIR)
 
 CLIENT_OBJ = $(DIR)/$(CLIENT_SRC:.c=.o)
 SERVER_OBJ = $(DIR)/$(SERVER_SRC:.c=.o)
@@ -31,8 +32,12 @@ client: $(CLIENT_OBJ) $(LIB)
 server: $(SERVER_OBJ) $(LIB)
 	$(CC) $(CFLAGS) $(SERVER_OBJ) $(LIB) -o server
 
-bonus:
-	$(MAKE) MODE=bonus $(filter-out bonus, $(MAKECMDGOALS))
+bonus: set_bonus all
+
+set_bonus:
+	DIR = $(B_DIR)
+	CLIENT_SRC = $(B_CLIENT_SRC)
+	SERVER_SRC = $(B_SERVER_SRC)
 	
 $(LIB):
 	@make -C libft
@@ -47,4 +52,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: re all clean fclean bonus
+.PHONY: re all clean fclean set_bonus

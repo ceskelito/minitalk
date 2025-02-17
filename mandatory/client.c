@@ -79,5 +79,4 @@ int main(int ac, char **av)
     server_pid = ft_atoi(av[1]);
     while (*av[2])
         encode_and_send(*av[2]++, server_pid);
-    ft_printf("\n-- Comunication completed --\n");
 }
