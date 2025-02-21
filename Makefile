@@ -1,5 +1,5 @@
 NAME	:= client server
-LIB 	:= libft/libft.a
+LIB 	:= LIBFT/libft.a
 
 CC 		:= cc
 CFLAGS 	:= -Wall -Wextra -Werror
@@ -7,14 +7,14 @@ RM 		:= rm -f
 
 MODE	?= mandatory
 
-DIR             := mandatory
-CLIENT_SRC      := client.c
-SERVER_SRC      := server.c
-
 ifeq ($(MODE), bonus)
 DIR             := bonus
 CLIENT_SRC      := bonus_client.c
 SERVER_SRC      := bonus_server.c
+else
+DIR             := mandatory
+CLIENT_SRC      := client.c
+SERVER_SRC      := server.c
 endif
 
 CLIENT_OBJ = $(DIR)/$(CLIENT_SRC:.c=.o)
@@ -35,14 +35,14 @@ bonus:
 	$(MAKE) MODE=bonus $(filter-out bonus, $(MAKECMDGOALS))
 	
 $(LIB):
-	@make -C libft
+	@make -C LIBFT
 
 clean:
-	@make -C libft clean
+	@make -C LIBFT clean
 	rm -f $(CLIENT_OBJ) $(SERVER_OBJ)
 
 fclean: clean
-	@make -C libft fclean
+	@make -C LIBFT fclean
 	$(RM) client server
 
 re: fclean all
