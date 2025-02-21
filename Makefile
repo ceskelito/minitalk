@@ -1,4 +1,4 @@
-NAME	:= client server
+NAME	= $(CLIENT) $(SERVER)
 LIB 	:= LIBFT/libft.a
 
 CC 		:= cc
@@ -8,10 +8,14 @@ RM 		:= rm -f
 MODE	?= mandatory
 
 ifeq ($(MODE), bonus)
+CLIENT		:= client_bonus
+SERVER		:= server_bonus
 DIR             := bonus
 CLIENT_SRC      := bonus_client.c
 SERVER_SRC      := bonus_server.c
 else
+CLIENT		:= client
+SERVER		:= server
 DIR             := mandatory
 CLIENT_SRC      := client.c
 SERVER_SRC      := server.c
@@ -25,11 +29,11 @@ SERVER_OBJ = $(DIR)/$(SERVER_SRC:.c=.o)
  
 all: $(NAME)
 
-client: $(CLIENT_OBJ) $(LIB)
-	$(CC) $(CFLAGS) $(CLIENT_OBJ) $(LIB) -o client
+$(CLIENT): $(CLIENT_OBJ) $(LIB)
+	$(CC) $(CFLAGS) $(CLIENT_OBJ) $(LIB) -o $(CLIENT)
 
-server: $(SERVER_OBJ) $(LIB)
-	$(CC) $(CFLAGS) $(SERVER_OBJ) $(LIB) -o server
+$(SERVER): $(SERVER_OBJ) $(LIB)
+	$(CC) $(CFLAGS) $(SERVER_OBJ) $(LIB) -o $(SERVER)
 
 bonus:
 	$(MAKE) MODE=bonus $(filter-out bonus, $(MAKECMDGOALS))
@@ -43,7 +47,7 @@ clean:
 
 fclean: clean
 	@make -C LIBFT fclean
-	$(RM) client server
+	$(RM) $(NAME)
 
 re: fclean all
 
